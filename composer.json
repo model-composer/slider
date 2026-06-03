@@ -1,0 +1,17 @@
+{
+    "name": "model/slider",
+    "description": "Easy-to-use JavaScript slider",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Domenico Giambra",
+            "email": "zorinik@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"Model\\Slider\\": "src/"}
+    },
+    "require": {
+        "model/assets": "^0.4.0"
+    }
+}
