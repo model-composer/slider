@@ -83,6 +83,14 @@ The possible attributes are:
 - **interval** (default `false`): the number of milliseconds between one slide and the next, for
   auto-scrolling.
 - **step** (default `1`): number of slides to move together in the auto-scroll, if set above.
+- **show-dots** (default `false`): when `true`, a row of pagination dots is rendered, centered,
+  in a new row below the slider. Clicking a dot moves the slider to that position. The active dot
+  is filled; the inactive ones show only a coloured border.
+- **dots-mode** (default `page`): how many dots to show when `show-dots` is on. `page` renders one
+  dot per page (`ceil(total slides / visible slides)`), so with 4 visible slides out of 12 you get
+  3 dots; `slide` renders one dot per individual slide regardless of how many are visible.
+- **dots-color**: the colour of the dots (any CSS colour). Applied through the
+  `--zkslide-dots-color` custom property; defaults to `#0d6efd` if unset.
 - **callback** (default empty): a JavaScript callback called every time the slider moves (either
   manually or via the auto-interval). It takes a single parameter, the index of the slide it has
   moved to. It is also called at page load, with the index of the initial slide. Set it as

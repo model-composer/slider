@@ -34,6 +34,9 @@ function zkCheckSlides() {
 			'step': 1,
 			'callback': false,
 			'start': 1,
+			'show-dots': false,
+			'dots-mode': 'page',
+			'dots-color': '',
 		};
 
 		for (let opt in options) {
@@ -107,9 +110,13 @@ function zkCheckSlides() {
 			queue: [],
 			moving: false,
 			interval: false,
+			dots: null,
+			dotsCount: 0,
 		};
 
 		slider.setAttribute('data-zkslide-set', k);
+
+		zkBuildDots(k);
 
 		zkFillStaticSlide(k, zkSlides[k].current);
 
@@ -321,6 +328,88 @@ function zkFillStaticSlide(k, from) {
 	}
 
 	zkSlides[k].current = from;
+
+	zkUpdateDots(k);
+}
+
+// --- Pagination dots ------------------------------------------------------------
+// Optional dots row rendered below the slider, centered. Activated only when the
+// carousel.php template emits data-show-dots (additive: every existing .zkslide on
+// other sites has no `dots` ref and is untouched). In `page` mode one dot covers a
+// page of `visible` slides (ceil(total/visible)); in `slide` mode one dot per slide.
+
+function zkSlideDotsCount(k) {
+	const slides = zkSlides[k].slides.length;
+	if (slides === 0)
+		return 0;
+	if (zkSlides[k].options['dots-mode'] === 'slide')
+		return slides;
+	return Math.ceil(slides / zkGetVisibleSlides(k));
+}
+
+function zkBuildDots(k) {
+	if (String(zkSlides[k].options['show-dots']) !== 'true')
+		return;
+
+	const count = zkSlideDotsCount(k);
+	if (count <= 1) // Nothing to paginate
+		return;
+
+	const dots = document.createElement('div');
+	dots.className = 'zkslide-dots';
+	if (zkSlides[k].options['dots-color'])
+		dots.style.setProperty('--zkslide-dots-color', zkSlides[k].options['dots-color']);
+
+	zkSlides[k].mainCont.parentNode.insertBefore(dots, zkSlides[k].mainCont.nextSibling);
+	zkSlides[k].dots = dots;
+	zkFillDots(k, count);
+}
+
+function zkFillDots(k, count) {
+	const dots = zkSlides[k].dots;
+	dots.innerHTML = '';
+	for (let i = 0; i < count; i++) {
+		const btn = document.createElement('button');
+		btn.type = 'button';
+		btn.className = 'zkslide-dot';
+		btn.setAttribute('aria-label', 'Slide ' + (i + 1));
+		btn.addEventListener('click', (function (k, i) {
+			return function () {
+				if (zkSlides[k].options['dots-mode'] === 'slide')
+					zkMoveSlide(k, i + 1);
+				else
+					zkMoveSlide(k, i * zkGetVisibleSlides(k) + 1);
+			};
+		})(k, i));
+		dots.appendChild(btn);
+	}
+	zkSlides[k].dotsCount = count;
+}
+
+function zkUpdateDots(k) {
+	if (!zkSlides[k] || !zkSlides[k].dots)
+		return;
+
+	// In page mode a responsive `visible` change alters the page count: rebuild.
+	const count = zkSlideDotsCount(k);
+	if (count <= 1) {
+		zkSlides[k].dots.innerHTML = '';
+		zkSlides[k].dotsCount = 0;
+	} else if (count !== zkSlides[k].dotsCount) {
+		zkFillDots(k, count);
+	}
+
+	// Keep the centered row the same width as the slider, so it lines up under it.
+	zkSlides[k].dots.style.width = zkSlides[k].mainCont.offsetWidth + 'px';
+
+	const current = zkNormalizeN(k, zkSlides[k].current);
+	const active = zkSlides[k].options['dots-mode'] === 'slide'
+		? current - 1
+		: Math.floor((current - 1) / zkGetVisibleSlides(k));
+
+	const buttons = zkSlides[k].dots.children;
+	for (let i = 0; i < buttons.length; i++)
+		buttons[i].className = i === active ? 'zkslide-dot active' : 'zkslide-dot';
 }
 
 function zkSlideResize(k, divs) {

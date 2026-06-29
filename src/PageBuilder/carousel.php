@@ -44,6 +44,19 @@ $height = (isset($config['height']) and is_string($config['height'])) ? trim($co
 if ($height !== '')
 	$attrs .= ' data-height="' . Renderer::escapeAttr($height) . '"';
 
+// Pagination dots below the slides (read by the zkslide runtime). dots-mode: one
+// dot per "page" (ceil(total/visible)) or one per slide; dots-color paints the
+// active(filled)/inactive(outlined) dots through the --zkslide-dots-color var.
+$showDots = (isset($config['showDots']) and $config['showDots']);
+if ($showDots) {
+	$attrs .= ' data-show-dots="true"';
+	$dotsMode = (isset($config['dotsMode']) and $config['dotsMode'] === 'slide') ? 'slide' : 'page';
+	$attrs .= ' data-dots-mode="' . $dotsMode . '"';
+	$dotsColor = (isset($config['dotsColor']) and is_string($config['dotsColor'])) ? trim($config['dotsColor']) : '';
+	if ($dotsColor !== '')
+		$attrs .= ' data-dots-color="' . Renderer::escapeAttr($dotsColor) . '"';
+}
+
 echo '<div' . $attrs . '>';
 foreach ($children as $slide)
 	echo '<div>' . $slide . '</div>';
