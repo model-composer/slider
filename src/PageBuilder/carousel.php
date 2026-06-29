@@ -30,10 +30,10 @@ $interval = (isset($config['interval']) and is_numeric($config['interval'])) ? (
 if ($interval > 0)
 	$attrs .= ' data-interval="' . $interval . '"';
 
-$forceWidth = !isset($config['forceWidth']) or $config['forceWidth'];
+$forceWidth = (!isset($config['forceWidth']) or $config['forceWidth']);
 $attrs .= ' data-force-width="' . ($forceWidth ? 'true' : 'false') . '"';
 
-$forceHeight = !isset($config['forceHeight']) or $config['forceHeight'];
+$forceHeight = (!isset($config['forceHeight']) or $config['forceHeight']);
 $attrs .= ' data-force-height="' . ($forceHeight ? 'true' : 'false') . '"';
 
 $width = (isset($config['width']) and is_string($config['width'])) ? trim($config['width']) : '';
